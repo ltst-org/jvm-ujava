@@ -13,18 +13,21 @@ import java.nio.file.Files;
 public class JvmApplication {
     private static final Log log = LogFactory.get(JvmApplication.class);
     /**
+     * 测试使用的 Class 文件地址
+     */
+    private static final String TEST_CLASS_PATH = "src/main/resources/class/TestHelloWorld.class";
+    /**
      * 主启动函数
      * @param args 入参
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         log.info("JvmApplication main run start");
-        File f = new File("src/main/resources/class/TestHelloWorld.class");
-        log.info("class file path :{}",f.getAbsolutePath());
-        if(!f.exists()){
-            throw new RuntimeException("被解析的class文件不存在");
+        try{
+            ClassFile cf = new ClassFile(TEST_CLASS_PATH);
+            cf.parseClass();
+            log.info("after parse ClassFile :{}",cf);
+        }catch (IOException e){
+            log.error("ClassFile parse error",e);
         }
-        ClassFile cf = new ClassFile();
-        cf.parseClass(new ClassReader(Files.newInputStream(f.toPath())));
-        log.info("after parse ClassFile :{}",cf);
     }
 }

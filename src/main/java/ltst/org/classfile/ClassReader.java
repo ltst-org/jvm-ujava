@@ -1,5 +1,9 @@
 package ltst.org.classfile;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.log.Log;
+import cn.hutool.log.LogFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -7,6 +11,8 @@ import java.io.InputStream;
  * class 文件读取器
  */
 public class ClassReader {
+    private static final Log log = LogFactory.get(ClassReader.class);
+
     private InputStream inputStream;
 
 
@@ -24,6 +30,16 @@ public class ClassReader {
     }
     public byte readU1() {return readByLength(1)[0];}
 
+    public void close(){
+        log.info("ClassReader close stream");
+        if(ObjectUtil.isNotNull(inputStream)){
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+                log.error("ClassReader close stream error : {}",e);
+            }
+        }
+    }
     private byte[] readByLength(int length){
         byte[] read = new byte[length];
         try {

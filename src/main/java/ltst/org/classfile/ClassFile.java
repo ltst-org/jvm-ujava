@@ -1,5 +1,6 @@
 package ltst.org.classfile;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ByteUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
@@ -9,7 +10,10 @@ import ltst.org.constantpool.ConstantTag;
 import ltst.org.constantpool.CpInfo;
 import ltst.org.constantpool.constantinfo.*;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.ByteOrder;
+import java.nio.file.Files;
 
 
 /**
@@ -19,6 +23,10 @@ import java.nio.ByteOrder;
 @ToString
 public class ClassFile {
     private static final Log log = LogFactory.get(ClassFile.class);
+    /**
+     * class 文件路径
+     */
+    private final String classFilePath;
     /**
      * 魔术
      */
@@ -38,23 +46,23 @@ public class ClassFile {
     /**
      * 常量池
      */
-    private Object[] constantPool;
+    private CpInfo[] constantPool;
     /**
      * 访问标志
      */
-    private int accessFlags;
+    private short accessFlags;
     /**
      * 当前类索引
      */
-    private String thisClass;
+    private short thisClass;
     /**
      * 父类索引
      */
-    private String superClass;
+    private short superClass;
     /**
      * 接口计数器
      */
-    private int interfacesCount;
+    private short interfacesCount;
     /**
      * 接口表
      */
@@ -62,7 +70,7 @@ public class ClassFile {
     /**
      * 字段计数器
      */
-    private int fieldsCount;
+    private short fieldsCount;
     /**
      * 字段表
      */
@@ -70,7 +78,7 @@ public class ClassFile {
     /**
      * 方法计数器
      */
-    private int methodCount;
+    private short methodCount;
     /**
      * 方法表
      */
@@ -78,7 +86,7 @@ public class ClassFile {
     /**
      * 属性计数器
      */
-    private int attributesCount;
+    private short attributesCount;
     /**
      * 属性表
      */
@@ -90,8 +98,18 @@ public class ClassFile {
         }
         return bf.toString();
     }
+    public ClassFile(String classFilePath){
+        this.classFilePath = classFilePath;
+    }
 
-    public void parseClass(ClassReader cr) {
+    public void parseClass() throws IOException {
+        // 解析前的检查
+        if(!FileUtil.exist(this.classFilePath)){
+            log.error("被解析的class文件不存在");
+            return;
+        }
+        //开始解析
+        ClassReader cr = new ClassReader(Files.newInputStream(new File(this.classFilePath).toPath()));
         this.magic = byte2Hex(cr.readU4());
         log.debug("ClassFile parse magic:{}",this.magic);
         this.minorVersion = ByteUtil.bytesToShort(cr.readU2(), ByteOrder.BIG_ENDIAN);
@@ -100,6 +118,22 @@ public class ClassFile {
         log.debug("ClassFile parse major:{}",this.majorVersion);
         this.constantPoolCount = ByteUtil.bytesToShort(cr.readU2(), ByteOrder.BIG_ENDIAN);
         log.debug("ClassFile parse constantPoolCount:{}",this.constantPoolCount);
+
+        parseConstantPool(cr);
+
+        for (int i = 1; i < this.constantPool.length; i++) {
+            log.debug("ClassFile parse constantPool i:{},cpInfo:{},str:{}",i,this.constantPool[i],this.constantPool[i].tag != ConstantTag.CONSTANT_Utf8 ? "":new String(((Utf8Info)this.constantPool[i]).bytes));
+        }
+
+        //解析后 关闭 数据流
+        cr.close();
+    }
+
+    /**
+     * 解析常量池
+     * @param cr class 读取工具
+     */
+    private void parseConstantPool(ClassReader cr){
         CpInfo[] constantPool = new CpInfo[this.constantPoolCount];
         // 常量池 0 号位置 为 null 可能是用于保留 ？ 未知设定含义
         for (int i = 1 ;i<this.constantPoolCount;i++){
@@ -120,8 +154,8 @@ public class ClassFile {
                 case ConstantTag.CONSTANT_InvokeDynamic:constantPool[i] = InvokeDynamicInfo.parse(cr);break;
             }
         }
-        for (int i = 1; i < constantPool.length; i++) {
-            log.debug("ClassFile parse constantPool i:{},cpInfo:{},str:{}",i,constantPool[i],constantPool[i].tag != ConstantTag.CONSTANT_Utf8 ? "":new String(((Utf8Info)constantPool[i]).bytes));
-        }
+        this.constantPool = constantPool;
     }
+
+
 }
