@@ -66,7 +66,7 @@ public class ClassFile {
     /**
      * 接口表
      */
-    private Object[] interfaces;
+    private CpInfo[] interfaces;
     /**
      * 字段计数器
      */
@@ -125,8 +125,30 @@ public class ClassFile {
             log.debug("ClassFile parse constantPool i:{},cpInfo:{},str:{}",i,this.constantPool[i],this.constantPool[i].tag != ConstantTag.CONSTANT_Utf8 ? "":new String(((Utf8Info)this.constantPool[i]).bytes));
         }
 
+        this.accessFlags = ByteUtil.bytesToShort(cr.readU2(),ByteOrder.BIG_ENDIAN);
+        log.debug("ClassFile parse accessFlags:{}",this.accessFlags);
+        this.thisClass =ByteUtil.bytesToShort(cr.readU2(),ByteOrder.BIG_ENDIAN);
+        log.debug("ClassFile parse thisClass:{}",this.thisClass);
+        this.superClass =ByteUtil.bytesToShort(cr.readU2(),ByteOrder.BIG_ENDIAN);
+        log.debug("ClassFile parse superClass:{}",this.superClass);
+        this.interfacesCount =ByteUtil.bytesToShort(cr.readU2(),ByteOrder.BIG_ENDIAN);
+        log.debug("ClassFile parse interfacesCount:{}",this.interfacesCount);
+
+        parseInterfaces(cr);
+        for (int i = 1; i < this.interfaces.length; i++) {
+            log.debug("ClassFile parse interfaces i:{},cpInfo:{},str:{}",i,this.interfaces[i],this.interfaces[i].tag != ConstantTag.CONSTANT_Utf8 ? "":new String(((Utf8Info)this.interfaces[i]).bytes));
+        }
+
+
+
         //解析后 关闭 数据流
         cr.close();
+    }
+
+    private void parseInterfaces(ClassReader cr) {
+        //TODO 暂时不做处理
+        CpInfo[] interFaceInfos = new CpInfo[this.interfacesCount];
+        this.interfaces = interFaceInfos;
     }
 
     /**
