@@ -1,7 +1,11 @@
 package ltst.org.attribute.info;
 
+import cn.hutool.core.util.ByteUtil;
 import ltst.org.attribute.AttributeInfo;
+import ltst.org.attribute.info.stackmapframe.*;
 import ltst.org.classfile.ClassReader;
+
+import java.nio.ByteOrder;
 
 /**
  * 变长属性
@@ -24,8 +28,28 @@ import ltst.org.classfile.ClassReader;
  */
 public class StackMapTable extends AttributeInfo {
     public short numberOfEntries;
-    public Object[] entries[];
+    public StackMapFrame[] entries;
     public StackMapTable(ClassReader cr) {
         super(cr);
+        this.numberOfEntries = ByteUtil.bytesToShort(cr.readU2(), ByteOrder.BIG_ENDIAN);
+        entries = new StackMapFrame[this.numberOfEntries];
+        for (int i = 0; i < entries.length; i++) {
+            byte type = cr.readU1();
+            if( type>=0 && type<=63){
+                entries[i] = new SameFrame(cr,type);
+            }else if(type >= 64 && type <= 127){
+                entries[i] = new SameLocals1StackItemFrame(cr,type);
+            }else if(type == 247){
+                entries[i] = new SameLocals1StackItemFrameExtended(cr,type);
+            }else if(type >= 248 && type <= 250){
+                entries[i] = new ChopFrame(cr,type);
+            }else if(type == 251){
+                entries[i] = new SameFrameExtended(cr,type);
+            }else if(type >= 252 && type <= 254){
+                entries[i] = new AppendFrame(cr,type);
+            }else if(type == 255){
+                entries[i] = new FullFrame(cr,type);
+            }
+        }
     }
 }

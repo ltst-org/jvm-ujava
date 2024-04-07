@@ -17,8 +17,8 @@ public class SameFrameExtended extends StackMapFrame{
     public static final byte tagType = FrameTag.SAME_FRAME_EXTENDED;
 
     public short offsetDelta;
-    public SameFrameExtended(ClassReader cr){
-        this.tag = cr.readU1();
+    public SameFrameExtended(ClassReader cr,byte frameType){
+        this.tag = frameType;
         this.offsetDelta = ByteUtil.bytesToShort(cr.readU2(), ByteOrder.BIG_ENDIAN);
     }
 }

@@ -157,7 +157,8 @@ public class ClassFile {
      */
     private void parseConstantPool(ClassReader cr){
         CpInfo[] constantPool = new CpInfo[this.constantPoolCount];
-        // 常量池 0 号位置 为 null 可能是用于保留 ？ 未知设定含义
+        // 常量池 0 号位置 空出来的原因是 表示 没有索引，
+        // 部分场景中 InnerClasses_attribute 中的 classes inner_name_index , Code_attribute 中的 exception_table 中的 catch_type 以上这些值部分场景中 可能为 0
         for (int i = 1 ;i<this.constantPoolCount;i++){
             switch (cr.readU1()){
                 case ConstantTag.CONSTANT_Utf8: constantPool[i] = Utf8Info.parse(cr);break;

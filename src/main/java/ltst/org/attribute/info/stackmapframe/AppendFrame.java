@@ -20,8 +20,8 @@ public class AppendFrame extends StackMapFrame{
     public static final byte tagType = FrameTag.APPEND_FRAME;
     public short offsetDelta;
     public VerificationInfo[] locals;
-    public AppendFrame(ClassReader cr){
-        this.tag = cr.readU1();
+    public AppendFrame(ClassReader cr,byte frameType){
+        this.tag = frameType;
         this.offsetDelta = ByteUtil.bytesToShort(cr.readU2(), ByteOrder.BIG_ENDIAN);
         locals = new VerificationInfo[this.tag - 251];
         for (int i = 0; i < locals.length; i++) {

@@ -16,8 +16,8 @@ import ltst.org.classfile.ClassReader;
 public class SameLocals1StackItemFrame extends StackMapFrame{
     public static final byte tagType = FrameTag.SAME_LOCALS_1_STACK_ITEM_FRAME;
     public VerificationInfo stack;
-    public SameLocals1StackItemFrame(ClassReader cr){
-        this.tag = cr.readU1();
+    public SameLocals1StackItemFrame(ClassReader cr,byte FrameType){
+        this.tag = FrameType;
         this.stack = new VerificationFactory(cr).getInfo();
     }
 }

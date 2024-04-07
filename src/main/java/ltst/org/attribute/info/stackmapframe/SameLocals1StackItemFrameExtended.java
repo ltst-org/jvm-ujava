@@ -22,8 +22,8 @@ public class SameLocals1StackItemFrameExtended extends StackMapFrame{
 
     public short offsetDelta;
     public VerificationInfo stack;
-    public SameLocals1StackItemFrameExtended(ClassReader cr){
-        this.tag = cr.readU1();
+    public SameLocals1StackItemFrameExtended(ClassReader cr,byte frameType){
+        this.tag = frameType;
         this.offsetDelta = ByteUtil.bytesToShort(cr.readU2(), ByteOrder.BIG_ENDIAN);
         this.stack = new VerificationFactory(cr).getInfo();
     }

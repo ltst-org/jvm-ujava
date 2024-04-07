@@ -16,8 +16,8 @@ import java.nio.ByteOrder;
 public class ChopFrame extends StackMapFrame{
     public static final byte tagType = FrameTag.CHOP_FRAME;
     public short offsetDelta;
-    public ChopFrame(ClassReader cr){
-        this.tag = cr.readU1();
+    public ChopFrame(ClassReader cr,byte frameType){
+        this.tag = frameType;
         this.offsetDelta = ByteUtil.bytesToShort(cr.readU2(), ByteOrder.BIG_ENDIAN);
     }
 }

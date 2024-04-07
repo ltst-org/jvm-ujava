@@ -12,7 +12,7 @@ import ltst.org.classfile.ClassReader;
  */
 public class SameFrame extends StackMapFrame{
     public static final byte tagType = FrameTag.SAME_FRAME;
-    public SameFrame(ClassReader cr){
-        this.tag = cr.readU1();
+    public SameFrame(ClassReader cr,byte frameType){
+        this.tag = frameType;
     }
 }

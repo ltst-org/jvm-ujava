@@ -38,12 +38,6 @@ public class Code extends AttributeInfo{
     public ExceptionInfo[] exceptionTable;
     public short attributesCount;
     public AttributeInfo[] attributes;
-    static class ExceptionInfo{
-        public short startPc;
-        public short endPc;
-        public short handlerPc;
-        public short catchType;
-    }
     public Code(ClassReader cr){
         super(cr);
         this.maxStack = ByteUtil.bytesToShort(cr.readU2(), ByteOrder.BIG_ENDIAN);
@@ -53,11 +47,7 @@ public class Code extends AttributeInfo{
         this.exceptionTableLength = ByteUtil.bytesToShort(cr.readU2(),ByteOrder.BIG_ENDIAN);
         this.exceptionTable = new ExceptionInfo[this.exceptionTableLength];
         for (int i = 0; i < exceptionTable.length; i++) {
-            exceptionTable[i] = new ExceptionInfo();
-            exceptionTable[i].startPc = ByteUtil.bytesToShort(cr.readU2(),ByteOrder.BIG_ENDIAN);
-            exceptionTable[i].endPc = ByteUtil.bytesToShort(cr.readU2(),ByteOrder.BIG_ENDIAN);
-            exceptionTable[i].handlerPc = ByteUtil.bytesToShort(cr.readU2(),ByteOrder.BIG_ENDIAN);
-            exceptionTable[i].catchType = ByteUtil.bytesToShort(cr.readU2(),ByteOrder.BIG_ENDIAN);
+            exceptionTable[i] = new ExceptionInfo(cr);
         }
         this.attributesCount = ByteUtil.bytesToShort(cr.readU2(),ByteOrder.BIG_ENDIAN);
         this.attributes = new AttributeInfo[this.attributesCount];
