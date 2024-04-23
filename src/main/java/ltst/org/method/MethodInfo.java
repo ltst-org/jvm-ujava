@@ -1,8 +1,14 @@
 package ltst.org.method;
 
+import cn.hutool.core.util.ByteUtil;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import ltst.org.attribute.AttributeInfo;
+import ltst.org.classfile.ClassReader;
+
+import java.nio.ByteOrder;
 
 /**
  * 每个方法 （method） 都由 method_info 结构所定义
@@ -30,10 +36,22 @@ import ltst.org.attribute.AttributeInfo;
  */
 @Getter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class MethodInfo {
     public short accessFlags;
     public short nameIndex;
     public short descriptorIndex;
     public short attributesCount;
-    public AttributeInfo[] attributes[];
+    public AttributeInfo[] attributes;
+    public MethodInfo(ClassReader cr){
+        this.accessFlags = ByteUtil.bytesToShort(cr.readU2(), ByteOrder.BIG_ENDIAN);
+        this.nameIndex = ByteUtil.bytesToShort(cr.readU2(), ByteOrder.BIG_ENDIAN);
+        this.descriptorIndex = ByteUtil.bytesToShort(cr.readU2(), ByteOrder.BIG_ENDIAN);
+        this.attributesCount = ByteUtil.bytesToShort(cr.readU2(), ByteOrder.BIG_ENDIAN);
+        this.attributes = new AttributeInfo[attributesCount];
+        for (int i = 0; i < this.attributes.length; i++) {
+            this.attributes[i] = new AttributeInfo(cr);
+        }
+    }
 }

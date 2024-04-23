@@ -1,6 +1,5 @@
 package ltst.org.constantpool;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 

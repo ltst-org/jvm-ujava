@@ -6,9 +6,12 @@ import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import lombok.Getter;
 import lombok.ToString;
+import ltst.org.attribute.AttributeInfo;
 import ltst.org.constantpool.ConstantTag;
 import ltst.org.constantpool.CpInfo;
 import ltst.org.constantpool.constantinfo.*;
+import ltst.org.field.FieldInfo;
+import ltst.org.method.MethodInfo;
 
 import java.io.File;
 import java.io.IOException;
@@ -66,7 +69,7 @@ public class ClassFile {
     /**
      * 接口表
      */
-    private CpInfo[] interfaces;
+    private short[] interfaces;
     /**
      * 字段计数器
      */
@@ -74,7 +77,7 @@ public class ClassFile {
     /**
      * 字段表
      */
-    private Object[] fields;
+    private FieldInfo[] fields;
     /**
      * 方法计数器
      */
@@ -82,7 +85,7 @@ public class ClassFile {
     /**
      * 方法表
      */
-    private Object[] method;
+    private MethodInfo[] method;
     /**
      * 属性计数器
      */
@@ -90,7 +93,8 @@ public class ClassFile {
     /**
      * 属性表
      */
-    private Object[] attributes;
+    private AttributeInfo[] attributes;
+
     public static String byte2Hex(byte[] bytes){
         StringBuilder bf = new StringBuilder();
         for (byte aByte : bytes) {
@@ -135,20 +139,65 @@ public class ClassFile {
         log.debug("ClassFile parse interfacesCount:{}",this.interfacesCount);
 
         parseInterfaces(cr);
-        for (int i = 1; i < this.interfaces.length; i++) {
-            log.debug("ClassFile parse interfaces i:{},cpInfo:{},str:{}",i,this.interfaces[i],this.interfaces[i].tag != ConstantTag.CONSTANT_Utf8 ? "":new String(((Utf8Info)this.interfaces[i]).bytes));
+        for (int i = 0; i < this.interfaces.length; i++) {
+            log.debug("ClassFile parse interfaces i:{},interface:{}",i,this.interfaces[i]);
         }
 
+        this.fieldsCount = ByteUtil.bytesToShort(cr.readU2(),ByteOrder.BIG_ENDIAN);
+        log.debug("ClassFile parse fieldsCount:{}",this.fieldsCount);
+        parseFields(cr);
+        for (int i = 0; i < this.fields.length; i++) {
+            log.debug("ClassFile parse fields i:{},fieldInfo:{}",i,this.fields[i]);
+        }
 
+        this.methodCount = ByteUtil.bytesToShort(cr.readU2(),ByteOrder.BIG_ENDIAN);
+        log.debug("ClassFile parse methodCount:{}",this.methodCount);
+        parseMethods(cr);
+        for (int i = 0; i < this.method.length; i++) {
+            log.debug("ClassFile parse method i:{},methodInfo:{}",i,this.method[i]);
+        }
+
+        this.attributesCount = ByteUtil.bytesToShort(cr.readU2(),ByteOrder.BIG_ENDIAN);
+        log.debug("ClassFile parse attributesCount:{}",this.attributesCount);
+        parseAttributes(cr);
+        for (int i = 0; i < this.attributes.length; i++) {
+            log.debug("ClassFile parse attribute i:{},attributeInfo:{}",i,this.attributes[i]);
+        }
 
         //解析后 关闭 数据流
         cr.close();
     }
 
+    private void parseAttributes(ClassReader cr) {
+        AttributeInfo[] attributeInfos = new AttributeInfo[this.attributesCount];
+        for (int i = 0; i < attributeInfos.length; i++) {
+            attributeInfos[i] = new AttributeInfo(cr);
+        }
+        this.attributes = attributeInfos;
+    }
+
+    private void parseMethods(ClassReader cr) {
+        MethodInfo[] methodInfos = new MethodInfo[this.methodCount];
+        for (int i = 0; i < methodInfos.length; i++) {
+            methodInfos[i] = new MethodInfo(cr);
+        }
+        this.method = methodInfos;
+    }
+
+    private void parseFields(ClassReader cr) {
+        FieldInfo[] fieldInfos = new FieldInfo[this.fieldsCount];
+        for (int i = 0; i < fieldInfos.length; i++) {
+            fieldInfos[i] = new FieldInfo(cr);
+        }
+        this.fields = fieldInfos;
+    }
+
     private void parseInterfaces(ClassReader cr) {
-        //TODO 暂时不做处理
-        CpInfo[] interFaceInfos = new CpInfo[this.interfacesCount];
-        this.interfaces = interFaceInfos;
+        short[] interfaces = new short[this.interfacesCount];
+        for (int i = 0; i < interfaces.length; i++) {
+            this.interfaces[i] = ByteUtil.bytesToShort(cr.readU2(),ByteOrder.BIG_ENDIAN);
+        }
+        this.interfaces = interfaces;
     }
 
     /**

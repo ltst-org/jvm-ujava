@@ -1,8 +1,14 @@
 package ltst.org.field;
 
+import cn.hutool.core.util.ByteUtil;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import ltst.org.attribute.AttributeInfo;
+import ltst.org.classfile.ClassReader;
+
+import java.nio.ByteOrder;
 
 /**
  * 每个字段 （field） 都由 field_info 结构所定义
@@ -27,10 +33,22 @@ import ltst.org.attribute.AttributeInfo;
  */
 @Getter
 @Builder
-public class fieldInfo {
+@NoArgsConstructor
+@AllArgsConstructor
+public class FieldInfo {
     public short accessFlags;
     public short nameIndex;
     public short descriptorIndex;
     public short attributesCount;
-    public AttributeInfo[] attributes[];
+    public AttributeInfo[] attributes;
+    public FieldInfo(ClassReader cr){
+        this.accessFlags = ByteUtil.bytesToShort(cr.readU2(), ByteOrder.BIG_ENDIAN);
+        this.nameIndex = ByteUtil.bytesToShort(cr.readU2(), ByteOrder.BIG_ENDIAN);
+        this.descriptorIndex = ByteUtil.bytesToShort(cr.readU2(), ByteOrder.BIG_ENDIAN);
+        this.attributesCount = ByteUtil.bytesToShort(cr.readU2(), ByteOrder.BIG_ENDIAN);
+        this.attributes = new AttributeInfo[this.attributesCount];
+        for (int i = 0; i < this.attributes.length; i++) {
+            this.attributes[i] = new AttributeInfo(cr);
+        }
+    }
 }
