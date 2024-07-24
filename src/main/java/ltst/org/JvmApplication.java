@@ -15,12 +15,13 @@ public class JvmApplication {
     /**
      * 测试使用的 Class 文件地址
      */
-    private static final String TEST_CLASS_PATH = "src/main/resources/class/TestHelloWorld.class";
+    private static final String TEST_CLASS_PATH = System.getProperty("user.dir")+File.separator+"src/main/resources/class/TestHelloWorld.class";
     /**
      * 主启动函数
      * @param args 入参
      */
     public static void main(String[] args) {
+        System.out.println(System.getProperties());
         log.info("JvmApplication main run start");
         try{
             ClassFile cf = new ClassFile(TEST_CLASS_PATH);
