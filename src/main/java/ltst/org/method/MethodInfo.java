@@ -1,10 +1,7 @@
 package ltst.org.method;
 
 import cn.hutool.core.util.ByteUtil;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ltst.org.attribute.AttributeInfo;
 import ltst.org.classfile.ClassReader;
 
@@ -38,6 +35,7 @@ import java.nio.ByteOrder;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class MethodInfo {
     public short accessFlags;
     public short nameIndex;
