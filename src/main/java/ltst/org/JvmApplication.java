@@ -5,6 +5,8 @@ import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import ltst.org.classfile.ClassFile;
 import ltst.org.classfile.ClassReader;
+import ltst.org.vm.JJExecutionEngine;
+import ltst.org.vm.JJVm;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,6 +29,10 @@ public class JvmApplication {
             ClassFile cf = new ClassFile(TEST_CLASS_PATH);
             cf.parseClass();
             log.info("after parse ClassFile :{}",cf);
+            JJVm vm = new JJVm(cf);
+            vm.start();
+            //执行引擎执行
+            JJExecutionEngine.exec(vm);
         }catch (IOException e){
             log.error("ClassFile parse error",e);
         }

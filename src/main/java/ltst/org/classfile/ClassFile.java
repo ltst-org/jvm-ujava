@@ -14,6 +14,7 @@ import ltst.org.field.FieldInfo;
 import ltst.org.method.MethodInfo;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteOrder;
 import java.nio.file.Files;
@@ -110,7 +111,7 @@ public class ClassFile {
         // 解析前的检查
         if(!FileUtil.exist(this.classFilePath)){
             log.error("被解析的class文件不存在");
-            return;
+            throw new FileNotFoundException("被解析的class文件不存在");
         }
         //开始解析
         ClassReader cr = new ClassReader(Files.newInputStream(new File(this.classFilePath).toPath()));
